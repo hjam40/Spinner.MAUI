@@ -6,7 +6,7 @@ For use the control after install de nuget package follow this steps:
 
 XAML:
 
-Add de namespace
+Add the namespace
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sc="clr-namespace:Spinner.MAUI;assembly=Spinner.MAUI"
