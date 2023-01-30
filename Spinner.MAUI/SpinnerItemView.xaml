@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Spinner.MAUI.SpinnerItemView"
+             x:Name="spinnerItem">
+    <Grid x:Name="BaseGrid" HorizontalOptions="Fill">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Image x:Name="image" BindingContext="{x:Reference spinnerItem}" Grid.Column="0"
+               HorizontalOptions="{Binding LabelHorizontalOptions}" VerticalOptions="{Binding LabelVerticalOptions}"
+               WidthRequest="{Binding ImageWidth}" HeightRequest="{Binding ImageHeight}" Aspect="{Binding ImageAspect}"
+               Margin="{Binding TextMargin}"/>
+        <Label x:Name="label" BindingContext="{x:Reference spinnerItem}" Grid.Column="1" Text="{Binding Text}"
+               HorizontalOptions="{Binding LabelHorizontalOptions}" VerticalOptions="{Binding LabelVerticalOptions}"
+               TextColor="{Binding TextColor}" FontAttributes="{Binding FontAttributes}" FontSize="{Binding FontSize}"
+               HorizontalTextAlignment="{Binding HorizontalTextAlignment}" VerticalTextAlignment="{Binding VerticalTextAlignment}"
+               Margin="{Binding TextMargin}"/>
+    </Grid>
+</ContentView>
