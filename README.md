@@ -6,13 +6,12 @@ For use the control after install de nuget package follow this steps:
 
 XAML:
 
-Add the namespace
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:sc="clr-namespace:Spinner.MAUI;assembly=Spinner.MAUI"
-             x:Class="Spinner.MAUI.Test.MainPage">
+Add the namespace:
+
+     xmlns:sc="clr-namespace:Spinner.MAUI;assembly=Spinner.MAUI"
   
 Use it:
+ 
         <Border HorizontalOptions="Center" VerticalOptions="Center" Grid.Row="1" Margin="10" Background="white">
             <Grid>
                 <Border VerticalOptions="Center" HeightRequest="30" Stroke="gray" Background="#EEEEEE" Margin="2,0,2,0" StrokeShape="RoundRectangle 10">
