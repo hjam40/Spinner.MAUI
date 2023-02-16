@@ -31,10 +31,15 @@
   
   <PropertyGroup>
     <PublishReadyToRun>false</PublishReadyToRun>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   
 	<ItemGroup>
 	  <None Include="..\..\..\..\Pictures\spinner.maui.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\README.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
