@@ -1,8 +1,8 @@
 ﻿namespace Spinner.MAUI;
 
-internal class SpinnerItem : ISpinnerItem
+public interface ISpinnerItem
 {
     public ImageSource ImageSource { get; set; }
-    public string Text { get; set; } = string.Empty;
+    public string Text { get; set; }
     public object Item { get; set; }
 }

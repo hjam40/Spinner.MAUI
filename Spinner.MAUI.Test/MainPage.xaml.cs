@@ -2,10 +2,10 @@
 
 public partial class MainPage : ContentPage
 {
-    public List<SpinnerItem> Items { get; set; }
-    public List<SpinnerItem> Hours { get; set; }
-    public List<SpinnerItem> Minutes { get; set; }
-    public List<SpinnerItem> Seconds { get; set; }
+    public List<ISpinnerItem> Items { get; set; }
+    public List<ISpinnerItem> Hours { get; set; }
+    public List<ISpinnerItem> Minutes { get; set; }
+    public List<ISpinnerItem> Seconds { get; set; }
     public int Hour { get; set; }
     public int Minute { get; set; }
     public int Second { get; set; }
@@ -14,10 +14,10 @@ public partial class MainPage : ContentPage
 
 	{
 		InitializeComponent();
-		Items = new List<SpinnerItem>();
-        Hours = new List<SpinnerItem>();
-        Minutes = new List<SpinnerItem>();
-        Seconds = new List<SpinnerItem>();
+		Items = new List<ISpinnerItem>();
+        Hours = new List<ISpinnerItem>();
+        Minutes = new List<ISpinnerItem>();
+        Seconds = new List<ISpinnerItem>();
         for (int i = 0; i < 10; i++)
 			Items.Add(new SpinnerItem { Text = "Item " + i.ToString(), ImageSource = ImageSource.FromFile("dotnet_bot.png") });
         OnPropertyChanged(nameof(Items));

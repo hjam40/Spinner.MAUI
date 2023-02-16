@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Spinner.MAUI.SpinnerItemView"
              x:Name="spinnerItem">
-    <Grid x:Name="BaseGrid" HorizontalOptions="Fill">
+    <Grid x:Name="BaseGrid" HorizontalOptions="Fill" Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>

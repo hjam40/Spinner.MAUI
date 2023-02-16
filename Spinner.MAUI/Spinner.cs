@@ -21,9 +21,9 @@ public class Spinner : ContentView
     public static readonly BindableProperty IsCyclicProperty = BindableProperty.Create(nameof(IsCyclic), typeof(bool), typeof(Spinner), false, propertyChanged: (b, o, n) => { if (o != n) ((Spinner)b).RefreshItems(true); });
     public static readonly BindableProperty UseHapticProperty = BindableProperty.Create(nameof(UseHaptic), typeof(bool), typeof(Spinner), true);
     public static readonly BindableProperty UseAccelerationProperty = BindableProperty.Create(nameof(UseAcceleration), typeof(bool), typeof(Spinner), true);
-    public static readonly BindableProperty ItemsProperty = BindableProperty.Create(nameof(Items), typeof(IEnumerable<SpinnerItem>), typeof(Spinner), null, propertyChanged: ItemsChanged);
+    public static readonly BindableProperty ItemsProperty = BindableProperty.Create(nameof(Items), typeof(IEnumerable<ISpinnerItem>), typeof(Spinner), null, propertyChanged: ItemsChanged);
     public static readonly BindableProperty SelectedItemIndexProperty = BindableProperty.Create(nameof(SelectedItemIndex), typeof(int), typeof(Spinner), 0, propertyChanged: SelectedItemIdxChanged);
-    public static readonly BindableProperty SelectedItemProperty = BindableProperty.Create(nameof(SelectedItem), typeof(SpinnerItem), typeof(Spinner), null, propertyChanged: SelectedItemChange);
+    public static readonly BindableProperty SelectedItemProperty = BindableProperty.Create(nameof(SelectedItem), typeof(ISpinnerItem), typeof(Spinner), null, propertyChanged: SelectedItemChange);
     
     public static readonly BindableProperty UpButtonDataProperty = BindableProperty.Create(nameof(UpButtonData), typeof(string), typeof(Spinner), UPBUTTONDATA, propertyChanged: (b, o, n) => { if (o != n) ((Spinner)b).RefreshSizes(); });
     public static readonly BindableProperty ButtonsStyleProperty = BindableProperty.Create(nameof(ButtonsStyle), typeof(Style), typeof(Spinner), BUTTONSTYLE, propertyChanged: (b, o, n) => { if (o != n) ((Spinner)b).RefreshSizes(); });
@@ -53,7 +53,7 @@ public class Spinner : ContentView
     /// <summary>
     /// A collection of SpinnerItem elemtes for the spinner.
     /// </summary>
-    public IEnumerable<SpinnerItem> Items { get => (IEnumerable<SpinnerItem>)GetValue(ItemsProperty); set => SetValue(ItemsProperty, value); }
+    public IEnumerable<ISpinnerItem> Items { get => (IEnumerable<ISpinnerItem>)GetValue(ItemsProperty); set => SetValue(ItemsProperty, value); }
     /// <summary>
     /// Indicates the selected item index when user changes it.
     /// </summary>
@@ -61,7 +61,7 @@ public class Spinner : ContentView
     /// <summary>
     /// Indicates the selected item when user changes it.
     /// </summary>
-    public SpinnerItem SelectedItem { get => (SpinnerItem)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+    public ISpinnerItem SelectedItem { get => (ISpinnerItem)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
     public string UpButtonData
     {
         get => (string)GetValue(UpButtonDataProperty);
@@ -104,6 +104,7 @@ public class Spinner : ContentView
     /// Indicates if the spinner central Border box is visible.
     /// </summary>
     public bool SelectionBoxIsVisible { get => (bool)GetValue(SelectionBoxIsVisibleProperty); set => SetValue(SelectionBoxIsVisibleProperty, value); }
+    public double ItemHeight { get => itemHeight; }
     /// <summary>
     /// Trigger when user change the selected item. The event does not trigger if SelectedItem or SelectedItemIndex property is set.
     /// </summary>
@@ -128,25 +129,26 @@ public class Spinner : ContentView
     private readonly Grid BaseGrid;
     private readonly Border SelectionBorder;
     private List<SpinnerItemView> showItems;
-    private Path UpPath;
-    private Border UpBorder;
-    private Path DownPath;
-    private Border DownBorder;
+    private readonly Path UpPath;
+    private readonly Border UpBorder;
+    private readonly Path DownPath;
+    private readonly Border DownBorder;
 
     public Spinner()
     {
         DefineDefaultStyles();
         BaseGrid = new Grid { BindingContext = this, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Fill };
         BaseGrid.SetBinding(BackgroundProperty, nameof(Background));
-        Background = Brush.Transparent;
+
         PanGestureRecognizer panGesture = new();
         panGesture.PanUpdated += PanGesture_PanUpdated;
-        PointerGestureRecognizer pointerGesture = new();
-        pointerGesture.PointerExited += PointerGesture_PointerExited;
         BaseGrid.GestureRecognizers.Add(panGesture);
-
         if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+        {
+            PointerGestureRecognizer pointerGesture = new();
+            pointerGesture.PointerExited += PointerGesture_PointerExited;
             BaseGrid.GestureRecognizers.Add(pointerGesture);
+        }
 
 
         SelectionBorder = new Border { BindingContext = this, Content = new Label { IsVisible = false } };
@@ -198,7 +200,6 @@ public class Spinner : ContentView
         DownBorder.Content = DownPathStk;
         BaseGrid.Add(DownBorder);
 
-        //BaseGrid.Add(PanStk);
         Content = BaseGrid;
     }
 
@@ -272,7 +273,7 @@ public class Spinner : ContentView
     private static void SelectedItemChange(BindableObject bindable, object oldValue, object newValue)
     {
         var spinner = bindable as Spinner;
-        if (oldValue != newValue && !spinner.changingSelection && newValue is SpinnerItem item)
+        if (oldValue != newValue && !spinner.changingSelection && newValue is ISpinnerItem item)
         {
             spinner.changingSelection = true;
             if (spinner.Items != null)
@@ -406,12 +407,12 @@ public class Spinner : ContentView
             }
         }
     }
-    private int IndexOf(SpinnerItem spinnerItem)
+    private int IndexOf(ISpinnerItem spinnerItem)
     {
         int idx = 0;
         if (spinnerItem != null)
         {
-            foreach (SpinnerItem item in Items)
+            foreach (ISpinnerItem item in Items)
             {
                 if (item == spinnerItem) break;
                 idx++;
@@ -614,10 +615,11 @@ public class Spinner : ContentView
     {
         if (sender is SpinnerItemView sItem)
         {
-            if (itemHeight < sItem.Height)
+            if (itemHeight != sItem.Height && sItem.Height > 0 && !sItem.IsEmpty())
             {
                 itemHeight = sItem.Height;
                 RefreshSizes();
+                OnPropertyChanged(nameof(ItemHeight));
             }
         }
     }
@@ -629,6 +631,7 @@ public class Spinner : ContentView
             BaseGrid.MinimumHeightRequest = itemHeight * NumItemsToShow + (ButtonsAreVisible ? UpBorder.HeightRequest * 2 : 0);
             if (SelectionBorder.HeightRequest > BaseGrid.MinimumHeightRequest)
                 BaseGrid.MinimumHeightRequest = SelectionBorder.HeightRequest;
+            if (MinimumHeightRequest < BaseGrid.MinimumHeightRequest) MinimumHeightRequest = BaseGrid.MinimumHeightRequest; 
             lock (translationLock)
             {
                 lastTotalPan = 100000;

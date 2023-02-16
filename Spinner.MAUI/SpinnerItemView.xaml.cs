@@ -44,9 +44,6 @@ public partial class SpinnerItemView : ContentView
     public double ImageHeight { get => (double)GetValue(ImageHeightProperty); set => SetValue(ImageHeightProperty, value); }
     public Aspect ImageAspect { get => (Aspect)GetValue(ImageAspectProperty); set => SetValue(ImageAspectProperty, value); }
     
-    public Image img { get => image; }
-    public Label lb { get => label; }
-    public Grid grd { get => BaseGrid; }
     public SpinnerItemView()
 	{
 		InitializeComponent();
@@ -56,7 +53,7 @@ public partial class SpinnerItemView : ContentView
         this.Text = Text;
         ImageSource = imageSource;
     }
-    public SpinnerItemView(SpinnerItem item) : this()
+    public SpinnerItemView(ISpinnerItem item) : this()
     {
         Text = item.Text;
         ImageSource = item.ImageSource;
@@ -72,6 +69,11 @@ public partial class SpinnerItemView : ContentView
         {
             if (BaseGrid.ColumnDefinitions.Count > 1) BaseGrid.ColumnDefinitions.RemoveAt(0);
         }
+    }
+
+    internal bool IsEmpty()
+    {
+        return ImageSource == null && string.IsNullOrEmpty(Text);
     }
 
     private static void ItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
