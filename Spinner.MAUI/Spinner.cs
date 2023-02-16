@@ -137,6 +137,7 @@ public class Spinner : ContentView
     public Spinner()
     {
         DefineDefaultStyles();
+        Background = Brush.Transparent;
         BaseGrid = new Grid { BindingContext = this, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Fill };
         BaseGrid.SetBinding(BackgroundProperty, nameof(Background));
 
