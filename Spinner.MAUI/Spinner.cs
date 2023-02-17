@@ -236,12 +236,28 @@ public class Spinner : ContentView
             {
                 itemsOld.CollectionChanged -= spinner.Events_CollectionChanged;
             }
-            lock (spinner.translationLock) spinner.RefreshItems(true);
+            lock (spinner.translationLock)
+            {
+                if (spinner.Items == null || spinner.SelectedItemIndex >= spinner.Items.Count())
+                {
+                    spinner.tmpSelectedIndex = 0;
+                    spinner.SetSelection(true);
+                }
+                spinner.RefreshItems(true);
+            }
         }
     }
     private void Events_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        lock (translationLock) RefreshItems(true);
+        lock (translationLock)
+        {
+            if (Items == null || SelectedItemIndex >= Items.Count())
+            {
+                tmpSelectedIndex = 0;
+                SetSelection(true);
+            }
+            RefreshItems(true);
+        }
     }
     private static void SelectedItemIdxChanged(BindableObject bindable, object oldValue, object newValue)
     {
@@ -347,8 +363,9 @@ public class Spinner : ContentView
 
             if (Items != null && Items.Any())
             {
-                showItems[numShowingItems / 2].Text = Items.ElementAt(tmpSelectedIndex).Text;
-                showItems[numShowingItems / 2].ImageSource = Items.ElementAt(tmpSelectedIndex).ImageSource;
+                int numItems = Items.Count();
+                showItems[numShowingItems / 2].Text = tmpSelectedIndex < numItems ? Items.ElementAt(tmpSelectedIndex).Text : string.Empty;
+                showItems[numShowingItems / 2].ImageSource = tmpSelectedIndex < numItems ? Items.ElementAt(tmpSelectedIndex).ImageSource : null;
                 int count = 1;
                 int startIndex = tmpSelectedIndex;
                 for (int i = (numShowingItems / 2) - 1; i >= 0; i--)
@@ -359,8 +376,8 @@ public class Spinner : ContentView
                         {
                             startIndex = Items.Count();
                             count = 1;
-                            showItems[i].Text = Items.ElementAt(startIndex - count).Text;
-                            showItems[i].ImageSource = Items.ElementAt(startIndex - count).ImageSource;
+                            showItems[i].Text = startIndex - count < numItems ? Items.ElementAt(startIndex - count).Text : string.Empty;
+                            showItems[i].ImageSource = startIndex - count < numItems ? Items.ElementAt(startIndex - count).ImageSource : null;
                         }
                         else
                         {
@@ -370,8 +387,8 @@ public class Spinner : ContentView
                     }
                     else
                     {
-                        showItems[i].Text = Items.ElementAt(startIndex - count).Text;
-                        showItems[i].ImageSource = Items.ElementAt(startIndex - count).ImageSource;
+                        showItems[i].Text = startIndex - count < numItems ? Items.ElementAt(startIndex - count).Text : string.Empty;
+                        showItems[i].ImageSource = startIndex - count < numItems ? Items.ElementAt(startIndex - count).ImageSource : null;
                     }
                     count++;
                 }
@@ -385,8 +402,8 @@ public class Spinner : ContentView
                         {
                             startIndex = 0;
                             count = 0;
-                            showItems[i].Text = Items.ElementAt(startIndex + count).Text;
-                            showItems[i].ImageSource = Items.ElementAt(startIndex + count).ImageSource;
+                            showItems[i].Text = startIndex + count < numItems ? Items.ElementAt(startIndex + count).Text : string.Empty;
+                            showItems[i].ImageSource = startIndex + count < numItems ? Items.ElementAt(startIndex + count).ImageSource : null;
                         }
                         else
                         {
@@ -396,15 +413,19 @@ public class Spinner : ContentView
                     }
                     else
                     {
-                        showItems[i].Text = Items.ElementAt(startIndex + count).Text;
-                        showItems[i].ImageSource = Items.ElementAt(startIndex + count).ImageSource;
+                        showItems[i].Text = startIndex + count < numItems ? Items.ElementAt(startIndex + count).Text : string.Empty;
+                        showItems[i].ImageSource = startIndex + count < numItems ? Items.ElementAt(startIndex + count).ImageSource : null;
                     }
                     count++;
                 }
             }
             else
             {
-                for (int i = 0; i < numShowingItems; i++) showItems[i].Text = string.Empty;
+                for (int i = 0; i < numShowingItems; i++)
+                {
+                    showItems[i].Text = string.Empty;
+                    showItems[i].ImageSource = null;
+                }
             }
         }
     }
@@ -474,7 +495,7 @@ public class Spinner : ContentView
     }
     private void DownClicked()
     {
-        if (IsCyclic || SelectedItemIndex < Items.Count() - 1)
+        if (Items != null && Items.Any() && (IsCyclic || SelectedItemIndex < Items.Count() - 1))
         {
             if (!animatingDownButton)
             {
@@ -564,7 +585,10 @@ public class Spinner : ContentView
         lock (translationLock)
         {
             SelectedItemIndex = tmpSelectedIndex;
-            SelectedItem = Items?.ElementAt(SelectedItemIndex);
+            if (Items != null && SelectedItemIndex < Items.Count())
+                SelectedItem = Items.ElementAt(SelectedItemIndex);
+            else
+                SelectedItem = null;
             totalPan = 0;
             if(!changingSelection) SelectionChanged?.Invoke(this, EventArgs.Empty);
         }

@@ -1,11 +1,13 @@
-﻿namespace Spinner.MAUI.Test;
+﻿using System.Collections.ObjectModel;
+
+namespace Spinner.MAUI.Test;
 
 public partial class MainPage : ContentPage
 {
     public List<ISpinnerItem> Items { get; set; }
     public List<ISpinnerItem> Hours { get; set; }
     public List<ISpinnerItem> Minutes { get; set; }
-    public List<ISpinnerItem> Seconds { get; set; }
+    public ObservableCollection<ISpinnerItem> Seconds { get; set; }
     public int Hour { get; set; }
     public int Minute { get; set; }
     public int Second { get; set; }
@@ -17,7 +19,7 @@ public partial class MainPage : ContentPage
 		Items = new List<ISpinnerItem>();
         Hours = new List<ISpinnerItem>();
         Minutes = new List<ISpinnerItem>();
-        Seconds = new List<ISpinnerItem>();
+        Seconds = new ObservableCollection<ISpinnerItem>();
         for (int i = 0; i < 10; i++)
 			Items.Add(new SpinnerItem { Text = "Item " + i.ToString(), ImageSource = ImageSource.FromFile("dotnet_bot.png") });
         OnPropertyChanged(nameof(Items));
